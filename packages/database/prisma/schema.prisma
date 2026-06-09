@@ -1,0 +1,530 @@
+// Webshop Prisma schema
+// Money uses Decimal (never float). Sensitive payloads are stored as ciphertext only.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Enums (mirror @webshop/types)
+// ============================================================
+
+enum DeliveryType {
+  INSTANT_ACCOUNT
+  INSTANT_KEY
+  MANUAL_SERVICE
+  INVITE_SLOT
+  CUSTOM_ORDER
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PAYMENT_EXPIRED
+  PAID
+  AWAITING_CUSTOMER_INFO
+  AWAITING_OPERATOR
+  PROCESSING
+  DELIVERED
+  COMPLETED
+  WARRANTY_REQUESTED
+  REFUND_PENDING
+  REFUNDED
+  CANCELLED
+  FAILED
+}
+
+enum PaymentStatus {
+  CREATED
+  WAITING
+  CONFIRMED
+  EXPIRED
+  FAILED
+  MANUALLY_REVIEWED
+}
+
+enum InventoryStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  DISABLED
+  REPLACED
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum WarrantyStatus {
+  OPEN
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  RESOLVED
+}
+
+enum TicketStatus {
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}
+
+enum RequirementType {
+  TEXT
+  EMAIL
+  SELECT
+  TEXTAREA
+}
+
+// ============================================================
+// Identity & access control
+// ============================================================
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  displayName  String
+  status       UserStatus @default(ACTIVE)
+  locale       String     @default("en")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  roles               UserRole[]
+  orders              Order[]            @relation("CustomerOrders")
+  assignedOrders      Order[]            @relation("OperatorOrders")
+  operatorAssignments OperatorAssignment[] @relation("AssignmentOperator")
+  assignmentsMade     OperatorAssignment[] @relation("AssignmentAssigner")
+  warrantyRequests    WarrantyRequest[]
+  supportTickets      SupportTicket[]
+  auditLogs           AuditLog[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique // ADMIN | OPERATOR | CUSTOMER
+  description String?
+  users       UserRole[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  key         String           @unique // e.g. orders.assign
+  description String?
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ============================================================
+// Catalog
+// ============================================================
+
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  parentId  String?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryTree")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  translations CategoryTranslation[]
+  products     Product[]
+
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id          String   @id @default(cuid())
+  categoryId  String
+  locale      String
+  name        String
+  description String?
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+  @@map("category_translations")
+}
+
+model Product {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  deliveryType DeliveryType
+  status       ProductStatus @default(DRAFT)
+  categoryId   String?
+  basePriceUsd Decimal       @db.Decimal(18, 6)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  category     Category?               @relation(fields: [categoryId], references: [id])
+  translations ProductTranslation[]
+  variants     ProductVariant[]
+  requirements FulfillmentRequirement[]
+
+  @@index([status])
+  @@index([categoryId])
+  @@map("products")
+}
+
+model ProductTranslation {
+  id        String  @id @default(cuid())
+  productId String
+  locale    String
+  name      String
+  shortDesc String?
+  longDesc  String?
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, locale])
+  @@map("product_translations")
+}
+
+model ProductVariant {
+  id          String   @id @default(cuid())
+  productId   String
+  sku         String   @unique
+  priceUsd    Decimal  @db.Decimal(18, 6)
+  durationDays Int?
+  attributes  Json?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product      Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  translations VariantTranslation[]
+  inventory    InventoryItem[]
+  orderItems   OrderItem[]
+  requirements FulfillmentRequirement[]
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model VariantTranslation {
+  id        String         @id @default(cuid())
+  variantId String
+  locale    String
+  name      String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([variantId, locale])
+  @@map("variant_translations")
+}
+
+// ============================================================
+// Inventory (credentials stored encrypted at rest only)
+// ============================================================
+
+model InventoryItem {
+  id               String          @id @default(cuid())
+  variantId        String
+  status           InventoryStatus @default(AVAILABLE)
+  encryptedPayload String          // AES-256-GCM ciphertext (creds / key)
+  encryptionKeyId  String          // key id for rotation
+  reservedByOrderId String?
+  soldAt           DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  orderItem OrderItem?
+
+  @@index([variantId, status])
+  @@map("inventory_items")
+}
+
+// ============================================================
+// Orders
+// ============================================================
+
+model Order {
+  id                String      @id @default(cuid())
+  orderNo           String      @unique
+  customerId        String
+  status            OrderStatus @default(DRAFT)
+  totalUsd          Decimal     @db.Decimal(18, 6)
+  currencySnapshot  String      @default("USD")
+  locale            String      @default("en")
+  assignedOperatorId String?
+  idempotencyKey    String?     @unique
+  paymentExpiresAt  DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  customer         User                  @relation("CustomerOrders", fields: [customerId], references: [id])
+  assignedOperator User?                 @relation("OperatorOrders", fields: [assignedOperatorId], references: [id])
+  items            OrderItem[]
+  payments         Payment[]
+  submissions      FulfillmentSubmission[]
+  deliveryResults  DeliveryResult[]
+  assignments      OperatorAssignment[]
+  warrantyRequests WarrantyRequest[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([assignedOperatorId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id              String       @id @default(cuid())
+  orderId         String
+  variantId       String
+  quantity        Int
+  unitPriceUsd    Decimal      @db.Decimal(18, 6)
+  deliveryType    DeliveryType
+  inventoryItemId String?      @unique
+
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant       ProductVariant @relation(fields: [variantId], references: [id])
+  inventoryItem InventoryItem? @relation(fields: [inventoryItemId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+// ============================================================
+// Payments
+// ============================================================
+
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String
+  provider        String        @default("epusdt")
+  providerTradeId String?       @unique
+  status          PaymentStatus @default(CREATED)
+  amountUsd       Decimal       @db.Decimal(18, 6)
+  cryptoToken     String?       // e.g. usdt
+  network         String?       // e.g. tron
+  amountCrypto    Decimal?      @db.Decimal(18, 6)
+  paymentUrl      String?
+  expiresAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  order  Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  events PaymentEvent[]
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
+
+model PaymentEvent {
+  id            String   @id @default(cuid())
+  paymentId     String
+  eventType     String
+  signatureValid Boolean
+  dedupeKey     String   @unique // idempotency for webhooks
+  rawPayload    Json
+  createdAt     DateTime @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@map("payment_events")
+}
+
+// ============================================================
+// Fulfillment & delivery
+// ============================================================
+
+model FulfillmentRequirement {
+  id        String          @id @default(cuid())
+  productId String?
+  variantId String?
+  fieldKey  String
+  label     String
+  type      RequirementType @default(TEXT)
+  options   Json?
+  required  Boolean         @default(true)
+  sensitive Boolean         @default(false)
+  sortOrder Int             @default(0)
+
+  product Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("fulfillment_requirements")
+}
+
+model FulfillmentSubmission {
+  id            String   @id @default(cuid())
+  orderId       String
+  encryptedData String   // ciphertext of customer-provided info
+  encryptionKeyId String
+  submittedAt   DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("fulfillment_submissions")
+}
+
+model DeliveryResult {
+  id               String   @id @default(cuid())
+  orderId          String
+  encryptedContent String   // ciphertext of delivered creds / result
+  encryptionKeyId  String
+  maskedPreview    String?
+  deliveredById    String?
+  deliveredAt      DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("delivery_results")
+}
+
+model OperatorAssignment {
+  id           String    @id @default(cuid())
+  orderId      String
+  operatorId   String
+  assignedById String
+  assignedAt   DateTime  @default(now())
+  releasedAt   DateTime?
+
+  order      Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  operator   User  @relation("AssignmentOperator", fields: [operatorId], references: [id])
+  assignedBy User  @relation("AssignmentAssigner", fields: [assignedById], references: [id])
+
+  @@index([orderId])
+  @@index([operatorId])
+  @@map("operator_assignments")
+}
+
+// ============================================================
+// Support & warranty
+// ============================================================
+
+model WarrantyRequest {
+  id         String         @id @default(cuid())
+  orderId    String
+  customerId String
+  reason     String
+  status     WarrantyStatus @default(OPEN)
+  resolution String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation(fields: [customerId], references: [id])
+
+  @@index([orderId])
+  @@map("warranty_requests")
+}
+
+model SupportTicket {
+  id         String          @id @default(cuid())
+  customerId String
+  orderId    String?
+  subject    String
+  status     TicketStatus    @default(OPEN)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  customer User             @relation(fields: [customerId], references: [id])
+  messages SupportMessage[]
+
+  @@index([customerId])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("support_messages")
+}
+
+// ============================================================
+// Audit, settings, pricing
+// ============================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorRole  String?
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+model AppSetting {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  value         Json
+  isSecret      Boolean  @default(false) // secrets stored encrypted in value
+  updatedAt     DateTime @updatedAt
+
+  @@map("app_settings")
+}
+
+model PricingSnapshot {
+  id            String   @id @default(cuid())
+  baseCurrency  String
+  quoteCurrency String
+  rate          Decimal  @db.Decimal(18, 8)
+  source        String?
+  fetchedAt     DateTime @default(now())
+
+  @@index([baseCurrency, quoteCurrency])
+  @@map("pricing_snapshots")
+}
