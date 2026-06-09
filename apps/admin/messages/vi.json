@@ -1,0 +1,46 @@
+{
+  "app": { "title": "Bảng điều khiển" },
+  "nav": {
+    "overview": "Tổng quan",
+    "orders": "Đơn hàng",
+    "fulfillment": "Hàng đợi xử lý",
+    "products": "Sản phẩm",
+    "inventory": "Kho",
+    "payments": "Thanh toán",
+    "customers": "Khách hàng",
+    "operators": "Nhân viên",
+    "audit": "Nhật ký",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất"
+  },
+  "login": {
+    "title": "Đăng nhập quản trị",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "submit": "Đăng nhập",
+    "error": "Email hoặc mật khẩu không đúng"
+  },
+  "overview": {
+    "title": "Tổng quan",
+    "subtitle": "Tóm tắt hệ thống",
+    "orders": "Đơn hàng",
+    "products": "Sản phẩm",
+    "pending": "Chờ xử lý"
+  },
+  "orders": {
+    "title": "Đơn hàng",
+    "orderNo": "Mã đơn",
+    "customer": "Khách hàng",
+    "status": "Trạng thái",
+    "total": "Tổng",
+    "date": "Ngày",
+    "empty": "Chưa có đơn hàng."
+  },
+  "products": {
+    "title": "Sản phẩm",
+    "name": "Tên",
+    "type": "Loại giao",
+    "price": "Giá",
+    "empty": "Chưa có sản phẩm."
+  }
+}

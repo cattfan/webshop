@@ -70,6 +70,24 @@ export class OrdersService {
     return this.toDetail(order.id, customerId, true);
   }
 
+  async listAll() {
+    const orders = await this.prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+      include: { items: true, customer: { select: { email: true, displayName: true } } },
+    });
+    return orders.map((o) => ({
+      id: o.id,
+      orderNo: o.orderNo,
+      status: o.status,
+      totalUsd: o.totalUsd.toString(),
+      itemCount: o.items.length,
+      customer: { email: o.customer.email, displayName: o.customer.displayName },
+      assignedOperatorId: o.assignedOperatorId,
+      createdAt: o.createdAt,
+    }));
+  }
+
   async listMine(customerId: string) {
     const orders = await this.prisma.order.findMany({
       where: { customerId },

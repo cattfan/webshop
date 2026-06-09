@@ -1,0 +1,46 @@
+{
+  "app": { "title": "后台管理" },
+  "nav": {
+    "overview": "概览",
+    "orders": "订单",
+    "fulfillment": "处理队列",
+    "products": "商品",
+    "inventory": "库存",
+    "payments": "支付",
+    "customers": "客户",
+    "operators": "操作员",
+    "audit": "审计日志",
+    "settings": "设置",
+    "logout": "退出"
+  },
+  "login": {
+    "title": "管理员登录",
+    "email": "邮箱",
+    "password": "密码",
+    "submit": "登录",
+    "error": "邮箱或密码错误"
+  },
+  "overview": {
+    "title": "概览",
+    "subtitle": "系统摘要",
+    "orders": "订单",
+    "products": "商品",
+    "pending": "待处理"
+  },
+  "orders": {
+    "title": "订单",
+    "orderNo": "订单号",
+    "customer": "客户",
+    "status": "状态",
+    "total": "总计",
+    "date": "日期",
+    "empty": "暂无订单。"
+  },
+  "products": {
+    "title": "商品",
+    "name": "名称",
+    "type": "交付方式",
+    "price": "价格",
+    "empty": "暂无商品。"
+  }
+}

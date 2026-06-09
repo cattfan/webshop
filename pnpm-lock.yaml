@@ -18,6 +18,55 @@ importers:
         specifier: ^5.6.2
         version: 5.9.3
 
+  apps/admin:
+    dependencies:
+      '@webshop/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@webshop/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@webshop/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^14.2.13
+        version: 14.2.35(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next-intl:
+        specifier: ^3.20.0
+        version: 3.26.5(next@14.2.35(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.7.4
+        version: 22.19.20
+      '@types/react':
+        specifier: ^18.3.10
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.31)
+      '@webshop/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      autoprefixer:
+        specifier: ^10.4.20
+        version: 10.5.0(postcss@8.5.15)
+      postcss:
+        specifier: ^8.4.47
+        version: 8.5.15
+      tailwindcss:
+        specifier: ^3.4.13
+        version: 3.4.19(tsx@4.22.4)
+      typescript:
+        specifier: ^5.6.2
+        version: 5.9.3
+
   apps/api:
     dependencies:
       '@nestjs/bullmq':

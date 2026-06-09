@@ -1,0 +1,46 @@
+{
+  "app": { "title": "Backoffice" },
+  "nav": {
+    "overview": "Overview",
+    "orders": "Orders",
+    "fulfillment": "Fulfillment queue",
+    "products": "Products",
+    "inventory": "Inventory",
+    "payments": "Payments",
+    "customers": "Customers",
+    "operators": "Operators",
+    "audit": "Audit logs",
+    "settings": "Settings",
+    "logout": "Sign out"
+  },
+  "login": {
+    "title": "Admin sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "error": "Invalid email or password"
+  },
+  "overview": {
+    "title": "Overview",
+    "subtitle": "System summary",
+    "orders": "Orders",
+    "products": "Products",
+    "pending": "Pending"
+  },
+  "orders": {
+    "title": "Orders",
+    "orderNo": "Order",
+    "customer": "Customer",
+    "status": "Status",
+    "total": "Total",
+    "date": "Date",
+    "empty": "No orders yet."
+  },
+  "products": {
+    "title": "Products",
+    "name": "Name",
+    "type": "Delivery",
+    "price": "Price",
+    "empty": "No products yet."
+  }
+}
