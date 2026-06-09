@@ -35,7 +35,7 @@ export const apiEnvSchema = z.object({
 
 export type ApiEnv = z.infer<typeof apiEnvSchema>;
 
-export function parseApiEnv(source: NodeJS.ProcessEnv): ApiEnv {
+export function parseApiEnv(source: Record<string, string | undefined>): ApiEnv {
   const parsed = apiEnvSchema.safeParse(source);
   if (!parsed.success) {
     const issues = parsed.error.issues

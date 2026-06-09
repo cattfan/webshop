@@ -7,8 +7,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "ES2022",
-    "outDir": "dist",
-    "rootDir": "src",
     "isolatedModules": false,
     "strictPropertyInitialization": false
   }
