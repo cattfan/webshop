@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "brand": "WEBSHOP",
+    "products": "商品",
+    "account": "账户",
+    "login": "登录"
+  },
+  "home": {
+    "title": "数字商品，即时交付。",
+    "subtitle": "卡密、账户与人工代办——加密货币付款，安全交付。",
+    "cta": "浏览商品",
+    "feature1Title": "即时交付",
+    "feature1Body": "付款确认后，卡密和账户将自动发放。",
+    "feature2Title": "加密货币支付",
+    "feature2Body": "使用 USDT 链上支付。每笔付款在交付前都经过服务器端验证。",
+    "feature3Title": "静态加密",
+    "feature3Body": "凭证均加密存储，全程访问可审计。"
+  },
+  "products": {
+    "title": "商品",
+    "empty": "暂无可用商品。",
+    "from": "起",
+    "view": "查看",
+    "deliveryType": "交付方式"
+  },
+  "product": {
+    "variants": "选项",
+    "buy": "结算",
+    "notFound": "未找到商品。"
+  },
+  "footer": {
+    "rights": "版权所有。",
+    "terms": "条款",
+    "refund": "退款政策"
+  }
+}

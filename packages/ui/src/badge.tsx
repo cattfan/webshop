@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from './cn.js';
+import { cn } from './cn';
 
 type Tone = 'solid' | 'outline';
 
@@ -19,3 +19,4 @@ export function Badge({ className, tone = 'outline', ...props }: BadgeProps) {
     />
   );
 }
+

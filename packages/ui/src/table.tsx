@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from './cn.js';
+import { cn } from './cn';
 
 export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) {
   return (
@@ -37,3 +37,4 @@ export function TR({ className, ...props }: React.HTMLAttributes<HTMLTableRowEle
 export function TD({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return <td className={cn('px-4 py-3 text-ink', className)} {...props} />;
 }
+

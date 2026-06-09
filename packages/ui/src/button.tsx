@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from './cn.js';
+import { cn } from './cn';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
 type Size = 'sm' | 'md' | 'lg';
@@ -38,3 +38,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ),
 );
 Button.displayName = 'Button';
+

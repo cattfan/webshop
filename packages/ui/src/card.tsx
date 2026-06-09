@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from './cn.js';
+import { cn } from './cn';
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
@@ -26,3 +26,4 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHead
     />
   );
 }
+

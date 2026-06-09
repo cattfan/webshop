@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "brand": "WEBSHOP",
+    "products": "Products",
+    "account": "Account",
+    "login": "Sign in"
+  },
+  "home": {
+    "title": "Digital goods, delivered instantly.",
+    "subtitle": "License keys, accounts, and managed fulfillment — paid in crypto, delivered securely.",
+    "cta": "Browse products",
+    "feature1Title": "Instant delivery",
+    "feature1Body": "Keys and accounts are released automatically the moment payment is confirmed.",
+    "feature2Title": "Crypto payments",
+    "feature2Body": "Pay with USDT on-chain. Every payment is verified server-side before fulfillment.",
+    "feature3Title": "Encrypted at rest",
+    "feature3Body": "Credentials are encrypted and access is audited end to end."
+  },
+  "products": {
+    "title": "Products",
+    "empty": "No products available yet.",
+    "from": "From",
+    "view": "View",
+    "deliveryType": "Delivery"
+  },
+  "product": {
+    "variants": "Options",
+    "buy": "Checkout",
+    "notFound": "Product not found."
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "terms": "Terms",
+    "refund": "Refund policy"
+  }
+}
